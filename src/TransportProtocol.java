@@ -10,14 +10,12 @@ import java.nio.file.Paths;
 public class TransportProtocol {
 
     static Socket socketClient = TalkToServer.socket;
+    static String nameFile;
 
     public static void takeSystemFile() throws IOException {
 
         OutputStream out = socketClient.getOutputStream();
-        DataOutputStream dout = new DataOutputStream(out);
 
-
-        dout.writeUTF("SYSTEM GETLIST");
 
         Path path = Paths.get("//systemXML//listfonts.xml");
         byte[] byteMass = Files.readAllBytes(path);
@@ -28,15 +26,20 @@ public class TransportProtocol {
     }
 
 
-    public static void takeFileFont(String nameFile) throws IOException {
+    public static void takeFileFont() throws IOException {
         OutputStream out = socketClient.getOutputStream();
         DataOutputStream dout = new DataOutputStream(out);
+        InputStream in = socketClient.getInputStream();
+        DataInputStream din = new DataInputStream(in);
+
+        nameFile = din.readUTF();// отдача имени
 
 
-        dout.writeUTF("SYSTEM FONT");
+
 
         Path path = Paths.get("//data//"+nameFile+".ttf");
         byte[] byteMass = Files.readAllBytes(path);
+        dout.writeInt(byteMass.length);//Отдача длины масства
         out.write(byteMass);
 
         dout.close();
@@ -50,6 +53,7 @@ public class TransportProtocol {
 
         InputStream in = socketClient.getInputStream();
         DataInputStream din = new DataInputStream(in);
+
 
         name=din.readUTF();//Get name font
 
